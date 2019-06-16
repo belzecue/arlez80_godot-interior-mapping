@@ -1,0 +1,148 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://interior_mapping.shader" type="Shader" id=1]
+[ext_resource path="res://ceil.jpg" type="Texture" id=2]
+[ext_resource path="res://tatami.jpg" type="Texture" id=3]
+[ext_resource path="res://wall.jpg" type="Texture" id=4]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Spatial
+
+var all_frame:float = 0.0
+var camera_distance:float = 2.0
+var camera_height:float = 0.2
+
+func _ready():
+	pass
+
+func _process( delta:float ):
+	self.all_frame += delta
+
+	var r:float = -self.all_frame * 0.8
+	$Camera.look_at_from_position(
+		Vector3( cos( r ) * self.camera_distance, self.camera_height, sin( r ) * self.camera_distance ),
+		Vector3( 0, 0, 0 ), Vector3( 0, 1, 0 )
+	)
+
+	$Window.visible = true
+
+
+func _on_CameraDistance_value_changed( value:float ):
+	self.camera_distance = value
+
+
+func _on_CameraHeight_value_changed( value:float ):
+	self.camera_height = value
+
+func _on_HScrollBar_value_changed( value:float ):
+	var shader:ShaderMaterial = $Box.get_surface_material( 0 )
+	shader.set_shader_param( \"d\", value )
+"
+
+[sub_resource type="CubeMesh" id=2]
+
+[sub_resource type="ShaderMaterial" id=3]
+shader = ExtResource( 1 )
+shader_param/d = 1.0
+shader_param/offset = Vector3( 0, 0, 0 )
+shader_param/detail_light = true
+shader_param/tex_ceil = ExtResource( 2 )
+shader_param/tex_floor = ExtResource( 3 )
+shader_param/tex_wall = ExtResource( 4 )
+
+[sub_resource type="SphereMesh" id=4]
+
+[node name="Scene" type="Spatial"]
+script = SubResource( 1 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( 0.998519, 0.0417704, -0.0348446, 0, 0.640574, 0.767897, 0.0543959, -0.76676, 0.639626, 0, 0.984374, 3.3297 )
+
+[node name="Camera" type="Camera" parent="."]
+
+[node name="Box" type="MeshInstance" parent="."]
+mesh = SubResource( 2 )
+material/0 = SubResource( 3 )
+
+[node name="Sphere" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.0811 )
+visible = false
+mesh = SubResource( 4 )
+material/0 = null
+
+[node name="Window" type="WindowDialog" parent="."]
+margin_left = 14.0
+margin_top = 39.0
+margin_right = 343.0
+margin_bottom = 226.0
+window_title = "DEBUG"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Window"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 4.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Window/VBoxContainer"]
+margin_right = 321.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Window/VBoxContainer/HBoxContainer"]
+margin_right = 108.0
+margin_bottom = 14.0
+text = "Camera Distance"
+
+[node name="CameraDistance" type="HScrollBar" parent="Window/VBoxContainer/HBoxContainer"]
+margin_left = 112.0
+margin_right = 321.0
+margin_bottom = 12.0
+size_flags_horizontal = 3
+min_value = 1.2
+max_value = 20.0
+step = 0.1
+value = 1.2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="Window/VBoxContainer"]
+margin_top = 18.0
+margin_right = 321.0
+margin_bottom = 32.0
+
+[node name="Label" type="Label" parent="Window/VBoxContainer/HBoxContainer2"]
+margin_right = 94.0
+margin_bottom = 14.0
+text = "Camera Height"
+
+[node name="CameraHeight" type="HScrollBar" parent="Window/VBoxContainer/HBoxContainer2"]
+margin_left = 98.0
+margin_right = 321.0
+margin_bottom = 12.0
+size_flags_horizontal = 3
+min_value = -5.0
+max_value = 5.0
+step = 0.05
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="Window/VBoxContainer"]
+margin_top = 36.0
+margin_right = 321.0
+margin_bottom = 50.0
+
+[node name="Label" type="Label" parent="Window/VBoxContainer/HBoxContainer3"]
+margin_right = 54.0
+margin_bottom = 14.0
+text = "Cell Size"
+
+[node name="HScrollBar" type="HScrollBar" parent="Window/VBoxContainer/HBoxContainer3"]
+margin_left = 58.0
+margin_right = 321.0
+margin_bottom = 12.0
+size_flags_horizontal = 3
+min_value = 0.2
+max_value = 6.0
+step = 0.01
+value = 0.2
+[connection signal="value_changed" from="Window/VBoxContainer/HBoxContainer/CameraDistance" to="." method="_on_CameraDistance_value_changed"]
+[connection signal="value_changed" from="Window/VBoxContainer/HBoxContainer2/CameraHeight" to="." method="_on_CameraHeight_value_changed"]
+[connection signal="value_changed" from="Window/VBoxContainer/HBoxContainer3/HScrollBar" to="." method="_on_HScrollBar_value_changed"]
