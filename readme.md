@@ -10,4 +10,4 @@ MIT License
 
 ## Screenshot
 
-![image](https://bitbucket.org/arlez80/interior-mapping/downloads/screenshot.PNG)
+![image](https://bitbucket.org/arlez80/godot-interior-mapping/downloads/screenshot.PNG)
