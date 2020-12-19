@@ -42,7 +42,7 @@ void check_surface( int i, float ray_dir, float surface, inout float min_t, inou
 {
 	float old_min_t = min_t;
 	bool is_flip = ray_dir < 0.0;
-	float t = - ( surface + mix( 0.0, 1.0, is_flip ) * d ) / ray_dir;
+	float t = - ( surface + float( is_flip ) * d ) / ray_dir;
 	min_t = min( min_t, t );
 	id = max( id, ( int( is_flip ) + i * 2 ) * int( min_t < old_min_t ) );
 }
@@ -67,23 +67,23 @@ void fragment( )
 	// 色決定
 	ALBEDO = (
 		// X+ X-
-		texture( tex_wall, vec2( hit.z, -hit.y ) ).xyz * mix( 0.0, 1.0, id == 0 )
-	+	texture( tex_wall, vec2( -hit.z, -hit.y ) ).xyz * mix( 0.0, 1.0, id == 1 )
+		texture( tex_wall, vec2( hit.z, -hit.y ) ).xyz * float( id == 0 )
+	+	texture( tex_wall, vec2( -hit.z, -hit.y ) ).xyz * float( id == 1 )
 		// Y+ Y-
-	+	texture( tex_ceil, vec2( hit.x, hit.z ) ).xyz * mix( 0.0, 1.0, id == 2 )
-	+	texture( tex_floor, vec2( hit.x, hit.z ) ).xyz * mix( 0.0, 1.0, id == 3 )
+	+	texture( tex_ceil, vec2( hit.x, hit.z ) ).xyz * float( id == 2 )
+	+	texture( tex_floor, vec2( hit.x, hit.z ) ).xyz * float( id == 3 )
 		// Z+ Z-
-	+	texture( tex_wall, vec2( -hit.x, -hit.y ) ).xyz * mix( 0.0, 1.0, id == 4 )
-	+	texture( tex_wall, vec2( hit.x, -hit.y ) ).xyz * mix( 0.0, 1.0, id == 5 )
+	+	texture( tex_wall, vec2( -hit.x, -hit.y ) ).xyz * float( id == 4 )
+	+	texture( tex_wall, vec2( hit.x, -hit.y ) ).xyz * float( id == 5 )
 	);
 	// 法線
 	NORMAL = mix(
 		NORMAL,
-			INV_CAMERA_MATRIX[0].xyz * mix( mix( 0.0, 1.0, id == 1 ), -1.0, id == 0 )
-		+	INV_CAMERA_MATRIX[1].xyz * mix( mix( 0.0, 1.0, id == 3 ), -1.0, id == 2 )
-		+	INV_CAMERA_MATRIX[2].xyz * mix( mix( 0.0, 1.0, id == 5 ), -1.0, id == 4 )
+			INV_CAMERA_MATRIX[0].xyz * mix( float( id == 1 ), -1.0, float( id == 0 ) )
+		+	INV_CAMERA_MATRIX[1].xyz * mix( float( id == 3 ), -1.0, float( id == 2 ) )
+		+	INV_CAMERA_MATRIX[2].xyz * mix( float( id == 5 ), -1.0, float( id == 4 ) )
 		,
-		detail_light
+		float( detail_light )
 	);
 	// 深度: TODO
 }

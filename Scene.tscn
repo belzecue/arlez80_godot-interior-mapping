@@ -66,7 +66,6 @@ material/0 = SubResource( 3 )
 
 [node name="Sphere" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.0811 )
-visible = false
 mesh = SubResource( 4 )
 material/0 = null
 
